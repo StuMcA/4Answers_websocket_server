@@ -8,7 +8,14 @@ const io = new Server(httpServer, {
   }
 });
 io.on("connection", (socket) => {
-  console.log(socket);
+  socket.join('room');
   io.emit("confirm", 'test')
+  console.log("Client connected");
+  
+  socket.on('tasty message', (msg) => {
+    console.log(msg);
+    io.emit('message', msg);
+  })
+
 });
 httpServer.listen(3001);

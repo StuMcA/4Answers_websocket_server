@@ -1,4 +1,4 @@
-class Game {
+class GameRoom {
     constructor(players) {
         this.players = players;
         this.gameRound = 1;

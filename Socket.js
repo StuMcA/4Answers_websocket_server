@@ -25,30 +25,9 @@ io.on("connection", (socket) => {
   
   // Gets start game message
   socket.on('start game', () => {
-
-    
     // Fetch question
     newGame.fetchQuestion(io);
 
-    // Send question - done 
-
-    // Periodically send timer, every second
-    // When timer gets to zero
-
-    // Get player input
-    
-    // Calculate scores
-
-    // Send Scores
-
-    // Add at one to round
-
-    // If round 4 end game
-
-    // Sends total scores
-
-
-    
   })
 
   socket.on('playerInput', (data) => {
@@ -56,9 +35,15 @@ io.on("connection", (socket) => {
     let playerFound = newGame.findPlayerById(data.userId);
     newGame.calculateRoundScore(data.input, playerFound, io);
     newGame.addToTotalScore(playerFound);
-    // newGame.fetchQuestion(io);
+    ioServer.emit('roundScore', player.roundScore);
     console.log(playerFound.totalScore);
 
+  })
+
+  socket.on('nextRound', () => {
+    console.log("next round function");
+    newGame.nextRound();
+    newGame.fetchQuestion(io);
   })
 
 });

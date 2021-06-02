@@ -26,11 +26,12 @@ class Game {
         });
     }
 
-    nextRound = () => {
+    nextRound = (ioServer) => {
         // this.calculateRoundScore();
         // this.ShowScore = true;
         if (this.gameRound === 4) {
-            this.endOfGame = true;
+            ioServer.emit('endOfGame', this.playerTotalScore);
+            
         }
         else {
             // this.ShowScore = false;

@@ -13,18 +13,18 @@ const io = new Server(httpServer, {
 });
 
 const newGame = new Game()
+let player = null;
 
 io.on("connection", (socket) => {
-  const player = new Player(socket.client.id, "Tom", "room");
-  newGame.players.push(player);
   // console.log(player);
-
-  io.emit('idReturned', socket.client.id);
-  socket.join('room1');
   // io.emit("confirm", 'test')
   
   // Gets start game message
   socket.on('start game', () => {
+    player = new Player(socket.client.id, "Tom", "room");
+    newGame.players.push(player);
+    io.emit('idReturned', socket.client.id);
+    socket.join('room1');
     // Fetch question
     newGame.fetchQuestion(io);
     // io.emit('idReturned', socket.client.id);
@@ -39,7 +39,7 @@ io.on("connection", (socket) => {
     newGame.addToTotalScore(data.userId);
     io.emit('roundScore', player.roundScore);
     setTimeout(() => {
-      newGame.nextRound();
+      newGame.nextRound(io);
       newGame.fetchQuestion(io);
     }, 6000)
     

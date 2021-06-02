@@ -46,7 +46,7 @@ io.on("connection", (socket) => {
         setTimeout(() => {
           newGame.nextRound(io);
           newGame.fetchQuestion(io);
-        }, 6000)
+        }, 2500)
       
     })
 

@@ -14,6 +14,7 @@ const io = new Server(httpServer, {
 
 const newGame = new Game()
 let player = null;
+let playerInputCount = 0;
 
 io.on("connection", (socket) => {
   // console.log(player);
@@ -39,17 +40,15 @@ io.on("connection", (socket) => {
   })
 
   socket.on('playerInput', (data) => {
-    // let playerFound = newGame.findPlayerById(data.userId);
-    // console.log(newGame.playerFound);
-    newGame.calculateRoundScore(data.input, data.userId, io);
-    newGame.addToTotalScore(data.userId);
-    io.emit('roundScore', player.roundScore);
-    setTimeout(() => {
-      newGame.nextRound(io);
-      newGame.fetchQuestion(io);
-    }, 6000)
-    
-  })
+      newGame.calculateRoundScore(data.input, data.userId, io);
+      newGame.addToTotalScore(data.userId);
+      io.emit('roundScore', player.roundScore);
+        setTimeout(() => {
+          newGame.nextRound(io);
+          newGame.fetchQuestion(io);
+        }, 6000)
+      
+    })
 
   // socket.on('nextRound', () => {
   //   newGame.nextRound();

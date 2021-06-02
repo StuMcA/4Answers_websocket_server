@@ -21,6 +21,12 @@ io.on("connection", (socket) => {
   
   // Gets start game message
   socket.on('start game', () => {
+    newGame.endGame = false;
+    newGame.gameRound = 1;
+    for (player of newGame.players) {
+      player.roundScore = 0;
+      player.totalScore = 0;
+    }
     player = new Player(socket.client.id, "Tom", "room");
     newGame.players.push(player);
     io.emit('idReturned', socket.client.id);

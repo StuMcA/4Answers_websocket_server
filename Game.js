@@ -9,6 +9,7 @@ class Game {
         this.endGame = false;
         this.playerInput = 0;
         this.selectedPlayer = null;
+        this.playerScores = [];
     }
 
     getRandomNumber = (maxNumber) => {
@@ -16,22 +17,30 @@ class Game {
     }
 
     fetchQuestion = (ioServer) => {
-        fetch(`https://quest-questions-answers-api.herokuapp.com/${this.gameRound}`)
-        .then(res => res.json())
-        .then(data => {
-            const randomQuestionIndex = this.getRandomNumber(data.length - 1)
-            this.question = data[randomQuestionIndex];
-            this.question.roundNumber = this.gameRound;
-            ioServer.emit('question', this.question);
-        });
+        if (!this.endGame) {
+            fetch(`https://quest-questions-answers-api.herokuapp.com/${this.gameRound}`)
+            .then(res => res.json())
+            .then(data => {
+                const randomQuestionIndex = this.getRandomNumber(data.length - 1)
+                this.question = data[randomQuestionIndex];
+                this.question.roundNumber = this.gameRound;
+                ioServer.emit('question', this.question);
+            });
+        }
     }
 
     nextRound = (ioServer) => {
         // this.calculateRoundScore();
         // this.ShowScore = true;
         if (this.gameRound === 4) {
-            ioServer.emit('endOfGame', this.playerTotalScore);
             
+            for (let player of this.players) {
+                this.playerScores.push({name: player.name, score: player.totalScore})
+            }
+            ioServer.emit('endOfGame', this.playerScores);
+            this.playerScores=[];
+            this.players=[];
+            this.endGame = true;
         }
         else {
             // this.ShowScore = false;

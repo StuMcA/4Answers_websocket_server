@@ -8,6 +8,7 @@ class Game {
         // this.showScore = false;
         this.endGame = false;
         this.playerInput = 0;
+        this.selectedPlayer = null;
     }
 
     getRandomNumber = (maxNumber) => {
@@ -20,7 +21,8 @@ class Game {
         .then(data => {
             const randomQuestionIndex = this.getRandomNumber(data.length - 1)
             this.question = data[randomQuestionIndex];
-            ioServer.emit('question', this.question)
+            this.question.roundNumber = this.gameRound;
+            ioServer.emit('question', this.question);
         });
     }
 
@@ -29,7 +31,6 @@ class Game {
         // this.ShowScore = true;
         if (this.gameRound === 4) {
             this.endOfGame = true;
-            this.showResults = true;
         }
         else {
             // this.ShowScore = false;
@@ -39,21 +40,25 @@ class Game {
     }
 
 
-    calculateRoundScore = (input, player, ioServer) => {
-        player.roundScore = (input / Math.max(input, 1) ) * (10000 - (Math.abs(this.question.answer - input) * (10 ** (4 - this.gameRound))));
+    calculateRoundScore = (input, playerId, ioServer) => {
+        this.selectedPlayer = this.findPlayerById(playerId);
+        this.selectedPlayer.roundScore = (input / Math.max(input, 1) ) * (10000 - (Math.abs(this.question.answer - input) * (10 ** (4 - this.gameRound))));
     }
 
-    addToTotalScore = (player) => {
+    addToTotalScore = (playerId) => {
+        let player = this.findPlayerById(playerId);
         player.totalScore = (player.totalScore + player.roundScore);
     }
 
     findPlayerById = (id) => {
-        let player = {};
-        for (player of this.players) {
+        let foundPlayer;
+        for (let player of this.players) {
             if ( player.id === id) {
-              return player;
+                foundPlayer = player;
             }
           }
+        return foundPlayer;
+
     }
 
 }

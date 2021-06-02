@@ -17,34 +17,38 @@ const newGame = new Game()
 io.on("connection", (socket) => {
   const player = new Player(socket.client.id, "Tom", "room");
   newGame.players.push(player);
+  // console.log(player);
 
   io.emit('idReturned', socket.client.id);
   socket.join('room1');
-  io.emit("confirm", 'test')
-  // console.log("Client connected");
+  // io.emit("confirm", 'test')
   
   // Gets start game message
   socket.on('start game', () => {
     // Fetch question
     newGame.fetchQuestion(io);
+    // io.emit('idReturned', socket.client.id);
+
 
   })
 
   socket.on('playerInput', (data) => {
-    console.log(data);
-    let playerFound = newGame.findPlayerById(data.userId);
-    newGame.calculateRoundScore(data.input, playerFound, io);
-    newGame.addToTotalScore(playerFound);
-    ioServer.emit('roundScore', player.roundScore);
-    console.log(playerFound.totalScore);
-
+    // let playerFound = newGame.findPlayerById(data.userId);
+    // console.log(newGame.playerFound);
+    newGame.calculateRoundScore(data.input, data.userId, io);
+    newGame.addToTotalScore(data.userId);
+    io.emit('roundScore', player.roundScore);
+    setTimeout(() => {
+      newGame.nextRound();
+      newGame.fetchQuestion(io);
+    }, 6000)
+    
   })
 
-  socket.on('nextRound', () => {
-    console.log("next round function");
-    newGame.nextRound();
-    newGame.fetchQuestion(io);
-  })
+  // socket.on('nextRound', () => {
+  //   newGame.nextRound();
+  //   newGame.fetchQuestion(io);
+  // })
 
 });
 httpServer.listen(3001);

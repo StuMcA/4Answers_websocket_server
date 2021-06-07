@@ -15,10 +15,34 @@ const io = new Server(httpServer, {
 const newGame = new Game()
 let player = null;
 let playerInputCount = 0;
+let playerReadyCount = 0;
 
 io.on("connection", (socket) => {
   // console.log(player);
   // io.emit("confirm", 'test')
+
+  socket.on("playerReady", (data) => {
+    if (data.playerReady) {
+      playerReadyCount -= 1;
+    } else {
+      playerReadyCount += 1;
+    }
+    if (!data.playerCreated) {
+      player = new Player(socket.client.id, data, "room");
+      newGame.players.push(player);
+      io.emit('idReturned', socket.client.id);
+      socket.join('room1');
+    }
+    io.emit('playersReady', playerReadyCount);
+
+  })
+
+  const interval = setInterval(() => {
+    if (playerReadyCount === 2) {
+      io.emit('allReady');
+      clearInterval(interval);
+    }
+  }, 500)
   
   // Gets start game message
   socket.on('start game', () => {
@@ -28,10 +52,7 @@ io.on("connection", (socket) => {
       player.roundScore = 0;
       player.totalScore = 0;
     }
-    player = new Player(socket.client.id, "Tom", "room");
-    newGame.players.push(player);
-    io.emit('idReturned', socket.client.id);
-    socket.join('room1');
+    
     // Fetch question
     newGame.fetchQuestion(io);
     // io.emit('idReturned', socket.client.id);
